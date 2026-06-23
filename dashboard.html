@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Dashboard</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: #0f172a; display: flex; justify-content: center; align-items: center; height: 100vh; color: white; }
+        .dashboard-container { background: #1e293b; padding: 50px; border-radius: 20px; width: 100%; max-width: 550px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.4); border: 1px solid #334155; }
+        .shield-icon { font-size: 64px; color: #10b981; margin-bottom: 20px; text-shadow: 0 0 15px rgba(16,185,129,0.4); }
+        h1 { font-size: 32px; font-weight: 700; margin-bottom: 10px; color: #f1f5f9; }
+        p { color: #94a3b8; font-size: 16px; margin-bottom: 30px; line-height: 1.6; }
+        .user-badge { display: inline-block; background: #0284c7; color: white; padding: 6px 16px; border-radius: 20px; font-weight: 600; font-size: 15px; margin-bottom: 20px; }
+        .logout-btn { background: #ef4444; color: white; border: none; padding: 12px 30px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .logout-btn:hover { background: #dc2626; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <div class="shield-icon">🛡️</div>
+    <h1>Secure Area Granted</h1>
+    <p>You have successfully logged in using encrypted session management tokens. This route is strictly protected from unauthenticated access logs.</p>
+    <div>
+        <span class="user-badge" id="welcome-username">Loading Profile...</span>
+    </div>
+    
+    <div id="admin-restricted-zone"></div>
+    
+    <br><br>
+    <button class="logout-btn" onclick="logout()">Terminate Session (Logout)</button>
+</div>
+
+<script>
+    window.addEventListener('DOMContentLoaded', async () => {
+        const res = await fetch('/api/auth/profile');
+        if (!res.ok) {
+            window.location.href = '/login.html';
+            return;
+        }
+        const data = await res.json();
+        document.getElementById('welcome-username').innerText = `Active User: ${data.username} (${data.role})`;
+        
+        // Dynamic access rendering rule logic based on user authentication privileges
+        if (data.role === 'Admin') {
+            const container = document.getElementById('admin-restricted-zone');
+            container.innerHTML = `
+                <div style="background: linear-gradient(135deg, #ef4444, #b91c1c); color: white; padding: 16px; border-radius: 12px; margin-top: 24px; font-weight: 700; font-size: 15px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); border: 1px solid #f87171;">
+                    🔑 Secret Admin Panel Unlocked!
+                </div>
+            `;
+        }
+    });
+
+    async function logout() {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        window.location.href = '/login.html';
+    }
+</script>
+</body>
+</html>
