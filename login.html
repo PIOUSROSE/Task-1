@@ -3,60 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Login</title>
+    <title>User Login Portal</title>
+
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #0f172a; display: flex; justify-content: center; align-items: center; height: 100vh; color: white; }
-        .auth-card { background: #1e293b; padding: 40px; border-radius: 16px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid #334155; }
-        h2 { margin-bottom: 24px; font-size: 28px; color: #38bdf8; text-align: center; font-weight: 700; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-size: 14px; color: #94a3b8; font-weight: 500; }
-        input { width: 100%; padding: 12px 16px; background: #0f172a; border: 2px solid #334155; border-radius: 8px; color: white; font-size: 15px; outline: none; transition: 0.2s; }
-        input:focus { border-color: #38bdf8; }
-        button { width: 100%; padding: 12px; background: #0284c7; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; margin-top: 10px; }
-        button:hover { background: #0369a1; transform: translateY(-1px); }
-        p { text-align: center; margin-top: 20px; font-size: 14px; color: #94a3b8; }
-        a { color: #38bdf8; text-decoration: none; font-weight: 600; }
-        a:hover { text-decoration: underline; }
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+
+        body{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            min-height:100vh;
+            background:linear-gradient(135deg,#0b1120,#1e3a8a);
+        }
+
+        .login-container{
+            width:380px;
+            background:#ffffff;
+            padding:35px;
+            border-radius:15px;
+            box-shadow:0 8px 25px rgba(0,0,0,0.25);
+        }
+
+        .login-title{
+            text-align:center;
+            margin-bottom:25px;
+            color:#1e3a8a;
+        }
+
+        .input-box{
+            margin-bottom:18px;
+        }
+
+        .input-box label{
+            display:block;
+            margin-bottom:6px;
+            font-size:14px;
+            font-weight:600;
+            color:#555;
+        }
+
+        .input-box input{
+            width:100%;
+            padding:12px;
+            border:1px solid #ccc;
+            border-radius:8px;
+            outline:none;
+        }
+
+        .input-box input:focus{
+            border-color:#2563eb;
+        }
+
+        .login-btn{
+            width:100%;
+            padding:12px;
+            border:none;
+            border-radius:8px;
+            background:#2563eb;
+            color:white;
+            font-size:16px;
+            cursor:pointer;
+        }
+
+        .login-btn:hover{
+            background:#1d4ed8;
+        }
+
+        .register-link{
+            text-align:center;
+            margin-top:18px;
+            font-size:14px;
+        }
+
+        .register-link a{
+            text-decoration:none;
+            color:#2563eb;
+            font-weight:bold;
+        }
     </style>
 </head>
 <body>
 
-<div class="auth-card">
-    <h2>Secure Login</h2>
-    <form id="login-form">
-        <div class="form-group">
-            <label>Email Address</label>
-            <input type="email" id="email" required placeholder="name@example.com">
+<div class="login-container">
+
+    <h2 class="login-title">Login Portal</h2>
+
+    <form id="signinForm">
+
+        <div class="input-box">
+            <label for="userEmail">Email</label>
+            <input type="email" id="userEmail" placeholder="Enter your email" required>
         </div>
-        <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="password" required placeholder="••••••••">
+
+        <div class="input-box">
+            <label for="userPassword">Password</label>
+            <input type="password" id="userPassword" placeholder="Enter your password" required>
         </div>
-        <button type="submit">Log In</button>
+
+        <button type="submit" class="login-btn">Sign In</button>
+
     </form>
-    <p>Don't have an account? <a href="/register.html">Register here</a></p>
+
+    <div class="register-link">
+        New User?
+        <a href="/register.html">Create Account</a>
+    </div>
+
 </div>
 
 <script>
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
+document.getElementById("signinForm").addEventListener("submit", async function(event) {
 
-        const res = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
+    event.preventDefault();
+
+    const email = document.getElementById("userEmail").value;
+    const password = document.getElementById("userPassword").value;
+
+    try {
+
+        const response = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
         });
 
-        const data = await res.json();
-        if (res.ok) {
-            window.location.href = '/dashboard.html';
+        const result = await response.json();
+
+        if(response.ok){
+            window.location.assign("/dashboard.html");
         } else {
-            alert(data.error || 'Invalid credentials');
+            alert(result.error || "Login failed");
         }
-    });
+
+    } catch(error) {
+        alert("Unable to connect to server.");
+    }
+});
 </script>
+
 </body>
 </html>
